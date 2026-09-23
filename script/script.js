@@ -1,124 +1,176 @@
+/* ============================================================
+   script.js — Halal Search
+   Clock · random hadith · search
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. Clock & date
+   ------------------------------------------------------------ */
+
 class MainFunc {
-  constructor(element) {
-    this.element = element;
+  constructor(root) {
+    this.root = root;
+    this.timeEl = root.querySelector('.time');
+    this.longEl = root.querySelector('.date-long');
+    this.shortEl = root.querySelector('.date-short');
+    this.timer = null;
   }
 
-  // Setup Time and Date
-
-  update() {
-    setInterval(() => {
-      this.formateTime();
-    }, 300);
+  start() {
+    this.render();
+    this.timer = setInterval(() => this.render(), 1000);
   }
 
-  formateTime() {
-    let nows = this.times();
-    let minutes = nows.m.toString().padStart(2, "0");
-    let session = nows.sess ? "AM" : "PM";
-    let nowClock = `${nows.h}:${minutes}`;
-    let nowDates = `${nows.d}, ${nows.dd} ${nows.mm} ${nows.yy}`;
-
-    this.element.querySelector(".time").textContent = nowClock;
-    this.element.querySelector(".date").textContent = nowDates;
+  stop() {
+    clearInterval(this.timer);
   }
 
-  times() {
-    let today = new Date();
-    let weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  render() {
+    const now = new Date();
 
-    return {
-      h: today.getHours(),
-      m: today.getMinutes(),
-      sess: today.getHours() < 12,
-      d: weekday[today.getDay()],
-      dd: today.getDate(),
-      mm: months[today.getMonth()],
-      yy: today.getFullYear(),
-    };
+    let hours = now.getHours();
+    const period = hours < 12 ? 'AM' : 'PM';
+    hours = hours % 12 || 12;
+
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    // rebuild the clock node so the AM/PM tag keeps its styling
+    this.timeEl.textContent = `${hours}:${minutes}`;
+
+    const periodEl = document.createElement('span');
+    periodEl.className = 'time-period';
+    periodEl.textContent = period;
+    this.timeEl.appendChild(periodEl);
+
+    this.longEl.textContent = now.toLocaleDateString(undefined, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+
+    this.shortEl.textContent = now.toLocaleDateString(undefined, {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    });
   }
 }
 
-let time = document.querySelector(".time-container");
-let play = new MainFunc(time);
-play.update();
+const clock = new MainFunc(document.querySelector('.time-container'));
+clock.start();
 
-// Setup hadist
-let hadisLoader = new HadisLoader();
-let loadedBooks = {};
+/* ------------------------------------------------------------
+   2. Random hadith
+   ------------------------------------------------------------ */
 
-let setupHadist = async () => {
-  let imam = ["abu-daud", "ahmad", "bukhari", "ibnu-majah", "malik", "muslim", "tirmidzi"];
-  let imamDisplay = ["Abu-Daud", "Ahmad", "Bukhari", "Ibnu-majah", "Malik", "Muslim", "Tirmidzi"];
-  
-  let rand = () => {
-    return Math.floor(Math.random() * imam.length);
-  };
+const hadisLoader = new HadisLoader();
 
-  let randIndex = rand();
-  let randImam = imam[randIndex];
-  let randImamDisplay = imamDisplay[randIndex];
+const IMAMS = [
+  { key: 'abu-daud', name: 'Abu-Daud' },
+  { key: 'ahmad', name: 'Ahmad' },
+  { key: 'bukhari', name: 'Bukhari' },
+  { key: 'ibnu-majah', name: 'Ibnu Majah' },
+  { key: 'malik', name: 'Malik' },
+  { key: 'muslim', name: 'Muslim' },
+  { key: 'tirmidzi', name: 'Tirmidzi' },
+];
+
+const hadithBody = document.querySelector('.hadith-body');
+const hadithText = document.querySelector('.hadist');
+const hadithImam = document.querySelector('.imam');
+const hadithCard = document.querySelector('.left-container');
+
+let requestToken = 0; // guards against out-of-order responses
+let hasRendered = false; // first load skips the fade-out
+
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function showRandomHadith() {
+  const token = ++requestToken;
+  const imam = pick(IMAMS);
+
+  // kick the fetch off immediately so it overlaps the fade-out
+  const bookPromise = hadisLoader.loadBook(imam.key);
+
+  if (hasRendered) {
+    hadithBody.classList.add('is-fading');
+    await wait(240);
+  } else {
+    hadithText.textContent = 'Memuat hadis…';
+    hadithImam.textContent = '—';
+  }
 
   try {
-    // Load the book if not already loaded
-    if (!loadedBooks[randImam]) {
-      loadedBooks[randImam] = await hadisLoader.loadBook(randImam);
-    }
+    const book = await bookPromise;
 
-    let response = loadedBooks[randImam];
+    if (token !== requestToken) return; // a newer request took over
 
-    let rand2 = () => {
-      return Math.floor(Math.random() * response.length);
-    };
+    const entry = pick(book);
+    const text = entry.id ?? entry.text ?? entry.hadith ?? '';
+    const number = entry.number ?? entry.no ?? '';
 
-    let randHadis = response[rand2()];
-    console.log(randHadis);
-    console.log(randImamDisplay);
-    document.querySelector(".hadist").textContent = `${randHadis.id}`;
-    document.querySelector(".imam").textContent = `Hr.Imam ${randImamDisplay} no.${randHadis.number}`;
+    hadithText.textContent = text || 'Hadis tidak tersedia.';
+    hadithImam.textContent = number
+      ? `HR. Imam ${imam.name} No. ${number}`
+      : `HR. Imam ${imam.name}`;
+
+    hasRendered = true;
   } catch (error) {
-    console.error('Error loading hadith:', error);
-    document.querySelector(".hadist").textContent = "Error loading data";
-    document.querySelector(".imam").textContent = "Please try again";
+    if (token !== requestToken) return;
+
+    console.error('Gagal memuat hadis:', error);
+    hadithText.textContent = 'Maaf, data hadis gagal dimuat.';
+    hadithImam.textContent = 'Periksa koneksi lalu coba lagi';
+  } finally {
+    if (token === requestToken) {
+      requestAnimationFrame(() => hadithBody.classList.remove('is-fading'));
+    }
   }
-};
+}
 
-setupHadist();
-// Setup Search bar
+/* ------------------------------------------------------------
+   3. Search bar
+   ------------------------------------------------------------ */
 
-let query = document.querySelector(".search");
-let submitSearch = document.querySelector(".submitSearch");
-let leftcontainer = document.querySelector(".left-container");
+const query = document.querySelector('.search');
+const submitSearch = document.querySelector('.submitSearch');
 
-let inputValues = () => {
-  let url = (V = "https://www.google.com/search?q=" + query.value);
-  if (query.value != "") {
-    window.open(url, "_self");
-    query.value = "";
+function handleSubmit() {
+  const value = query.value.trim();
+
+  if (value) {
+    const url = 'https://www.google.com/search?q=' + encodeURIComponent(value);
+    window.open(url, '_self');
+    query.value = '';
   } else {
-    setupHadist();
+    showRandomHadith();
   }
-};
+}
 
-query.addEventListener("keyup", function (event) {
-  if (event.keyCode === 13) {
-    inputValues();
-  }
-});
-
-submitSearch.addEventListener("click", () => {
-  inputValues();
-});
-
-submitSearch.addEventListener("mouseover", (event) => {
-  if (query.value !== "") {
-    query.style.boxShadow = "0 0 13px blue";
-  } else {
-    leftcontainer.style.boxShadow = "0 0 13px pink";
+query.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    handleSubmit();
   }
 });
 
-submitSearch.addEventListener("mouseleave", (event) => {
-  query.style.boxShadow = "none";
-  leftcontainer.style.boxShadow = "none";
-});
+submitSearch.addEventListener('click', handleSubmit);
+
+/* Desktop-only hover hint: empty input → highlight the hadith card */
+if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  submitSearch.addEventListener('mouseenter', () => {
+    if (!query.value.trim()) hadithCard.classList.add('glow');
+  });
+
+  submitSearch.addEventListener('mouseleave', () => {
+    hadithCard.classList.remove('glow');
+  });
+}
+
+/* ------------------------------------------------------------
+   4. Boot
+   ------------------------------------------------------------ */
+
+showRandomHadith();

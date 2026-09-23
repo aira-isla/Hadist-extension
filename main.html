@@ -4,40 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#02231d">
+    <meta name="description" content="Halal Search — pencarian & hadis pilihan">
     <link rel="icon" type="image/x-icon" href="/icon/mosque.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600&family=Lora:wght@400;500&display=swap">
     <link rel="stylesheet" href="script/style.css">
-    <title>hallal search</title>
+    <title>Halal Search</title>
 </head>
 
 <body>
     <div class="main-container">
-        <div class="right">
-            <div class="right-container">
-                <div class="time-container prevent-select">
-                    <div class="time"></div>
-                    <div class="date"></div>
+        <div class="layout">
+
+            <!-- ==================== HADIS ==================== -->
+            <section class="left" aria-label="Hadis">
+                <div class="left-container">
+                    <div class="hadith-scroll">
+                        <div class="hadith-body">
+                            <div class="ornament" aria-hidden="true">
+                                <span class="line"></span>
+                                <span class="rub">۞</span>
+                                <span class="line"></span>
+                            </div>
+
+                            <p class="hadist">Memuat hadis…</p>
+
+                            <div class="imam-row">
+                                <h4 class="imam">—</h4>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="search-container">
-                    <input class="search" type="search" autofocus spellcheck="false" name="" placeholder="Search...">
-                    <button type="submit" class="submitSearch prevent-select"><img
-                            src="./icon/MagnifyingGlass.svg"></button>
+            </section>
+
+            <!-- ==================== CLOCK + SEARCH ==================== -->
+            <section class="right">
+                <div class="right-container">
+
+                    <div class="brand">
+                        <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" fill="currentColor" />
+                        </svg>
+                        <span>Halal Search</span>
+                    </div>
+
+                    <div class="time-container prevent-select">
+                        <div class="time" data-period=""></div>
+                        <div class="date">
+                            <span class="date-long"></span>
+                            <span class="date-short"></span>
+                        </div>
+                    </div>
+
+                    <div class="search-container">
+                        <input class="search" type="search" spellcheck="false" placeholder="Cari sesuatu…"
+                            aria-label="Search" enterkeyhint="search" autocomplete="off">
+                        <button type="button" class="submitSearch prevent-select" aria-label="Cari / Hadis acak">
+                            <img src="./icon/MagnifyingGlass.svg" alt="">
+                        </button>
+                    </div>
+
+                    <p class="hint">Kosongkan kolom &amp; tekan tombol untuk hadis acak</p>
+
                 </div>
-            </div>
+            </section>
 
         </div>
-
-        <div class="left">
-            <div class="left-container">
-                <p class="hadist">lorem praesentium autem voluptatum temporibus.</p>
-                <h4 class="imam">Hr.bukhori no.120</h4>
-            </div>
-        </div>
-
-        <script src="script/hadis-loader.js"></script>
-        <script src="script/script.js"></script>
-
     </div>
+
+    <script src="script/hadis-loader.js"></script>
+    <script src="script/script.js"></script>
 </body>
 
 </html>

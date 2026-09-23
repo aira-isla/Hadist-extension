@@ -1,195 +1,458 @@
-@font-face {
-  font-family: sans-pro;
-  src: url(/file/font/sourcesanspro-regular-webfont.woff2);
+/* ============================================================
+   HALAL SEARCH — Islamic-inspired, responsive UI
+   Mobile-first · comfortable reading · warm cultural palette
+   ============================================================ */
+
+:root {
+  --deep: #02231d;
+  --deep-2: #01120f;
+  --emerald: #06403a;
+  --emerald-soft: #0b5a50;
+  --gold: #c9a227;
+  --gold-2: #e8cf8b;
+  --cream: #f9f5ea;
+  --cream-2: #efe7d5;
+  --ink: #12211e;
+  --ink-soft: #4a5a55;
+
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-read: 'Lora', Georgia, 'Times New Roman', serif;
+  --font-ar: 'Amiri', 'Times New Roman', serif;
+
+  --r-lg: 24px;
+  --r-md: 16px;
+  --r-pill: 999px;
+
+  --shadow-card: 0 24px 60px -28px rgba(0, 0, 0, .75);
+  --shadow-soft: 0 14px 34px -20px rgba(0, 0, 0, .9);
 }
 
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--deep-2);
+  color: var(--cream);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
 }
+
+/* ---------- Background ---------- */
 
 .main-container {
-  width: 100svw;
-  height: 100svh;
-  display: grid;
-  grid-template-columns: 60% 40%;
-  background-image: url("/file/1.jpg");
-  background-position: center;
-  background-size: cover;
-  overflow: hidden;
-
+  position: relative;
   isolation: isolate;
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 50% -15%, rgba(201, 162, 39, .20), transparent 62%),
+    radial-gradient(90% 70% at 105% 105%, rgba(11, 90, 80, .55), transparent 70%),
+    linear-gradient(165deg, #052e27 0%, #02231d 45%, #01120f 100%);
 }
 
+/* subtle geometric star lattice */
 .main-container::before {
   content: "";
   position: absolute;
-  width: 100svw;
-  height: 100svh;
-  background-color: rgba(36, 39, 39, 0.212);
-  opacity: 0.5;
+  inset: -5%;
   z-index: -1;
+  opacity: .14;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='64'%20height='64'%20viewBox='0%200%2064%2064'%3E%3Cg%20fill='none'%20stroke='%23c9a227'%20stroke-width='0.9'%3E%3Cpath%20d='M32%204l8%2020%2020%208-20%208-8%2020-8-20-20-8%2020-8z'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='3.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 64px 64px;
 }
 
-/* Css Hadist container */
+/* ---------- Layout shell ---------- */
 
-.left {
-  order: 1;
-  display: grid;
-  align-items: center;
-  padding: 2em;
-}
-
-.left-container {
-  background-color: rgba(194, 208, 228, 0.868);
-  padding: 1.5em;
-  border-radius: 10px;
-  max-height: 90svh;
-  overflow: scroll;
-  -ms-overflow-style: none; /*Ie and Edge */
-  scrollbar-width: none;
-  box-shadow: 0 0 transparent;
-}
-
-.left-container::-webkit-scrollbar {
-  display: none;
-}
-.left-container p {
-  font-family: "sans-pro";
-  letter-spacing: 0.8px;
-  text-indent: 1rem;
-  font-size: 1.4rem;
-  line-height: 2rem;
-  color: #000000;
-}
-
-.left-container h4 {
-  font-size: 1.3rem;
-  margin-top: 0.5rem;
-  margin-right: 2.8rem;
-  text-align: end;
-}
-
-/* Css Search bar container */
-
-.right {
-  order: 2;
+.layout {
+  width: 100%;
+  max-width: 1280px;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  text-align: center;
-  padding: 1em;
+  gap: 14px;
+  padding:
+    max(14px, env(safe-area-inset-top))
+    max(14px, env(safe-area-inset-right))
+    max(14px, env(safe-area-inset-bottom))
+    max(14px, env(safe-area-inset-left));
+}
+
+/* ============================================================
+   RIGHT  —  brand · clock · search
+   ============================================================ */
+
+.right {
+  order: 1;
+  flex: 0 0 auto;
 }
 
 .right-container {
-  margin-top: 8em;
-  padding: 1.5rem;
-  border-radius: 1rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, rgba(6, 64, 58, .74), rgba(2, 35, 29, .86));
+  border: 1px solid rgba(201, 162, 39, .26);
+  box-shadow: var(--shadow-card);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
-/*Css Time container */
+/* brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+}
+
+.brand-icon { width: 18px; height: 18px; color: var(--gold); flex: none; }
+
+/* clock */
 .time-container {
-  background-color: rgba(26, 22, 30, 0.727);
-  border-radius: 10px;
-  padding: 1em;
-  height: 110px;
-  width: 270px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  background: rgba(1, 18, 15, .58);
+  border: 1px solid rgba(201, 162, 39, .20);
 }
 
 .time {
-  font-family: sans-serif;
-  font-size: 3em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: .14em;
   font-weight: 600;
-  color: white;
+  font-size: clamp(1.6rem, 7vw, 2.35rem);
+  line-height: 1;
+  letter-spacing: .01em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-period {
+  font-size: .38em;
+  font-weight: 600;
+  letter-spacing: .14em;
+  color: var(--gold);
 }
 
 .date {
-  text-transform: capitalize;
-  font-family: Georgia, "Times New Roman", Times, serif;
-  font-weight: 500;
-  font-size: 1.3rem;
-  color: rgb(117, 197, 197);
-
+  flex: 1 1 auto;
+  text-align: right;
+  font-family: var(--font-read);
+  font-style: italic;
+  font-size: .82rem;
+  line-height: 1.35;
+  color: rgba(232, 207, 139, .88);
 }
 
-/* Css Search container */
+.date-short { display: block; }
+.date-long  { display: none; }
+
+/* search */
 .search-container {
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin-top: 2em;
-  border-radius: 2rem;
-  background-color: #ffffff;
+  gap: 8px;
+  padding: 6px 6px 6px 18px;
+  border-radius: var(--r-pill);
+  background: rgba(249, 245, 234, .97);
+  border: 1px solid rgba(201, 162, 39, .38);
+  box-shadow: var(--shadow-soft);
+  transition: box-shadow .25s ease, border-color .25s ease;
 }
 
-.search-container input {
-  line-height: 2.5rem;
-  border-radius: 2rem 0 0 2rem;
-  outline: none;
-  padding-right: 0.5rem;
-  padding-left: 1.5rem;
-  font-size: 1.1rem;
-  letter-spacing: 0.1rem;
-  border: 3px solid transparent;
+.search-container:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(201, 162, 39, .22), var(--shadow-soft);
 }
+
+.search {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  color: var(--ink);
+  padding: 12px 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.search::placeholder { color: #8b9a95; }
+.search::-webkit-search-cancel-button { -webkit-appearance: none; }
 
 .submitSearch {
-  height: 2.5rem;
-  width: 2.5rem;
-  border-radius: 0 2rem 2rem 0;
-  color-scheme: rgb(56, 69, 239);
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
   border: none;
-  padding: 0.5rem;
-  z-index: 10;
+  border-radius: 50%;
+  background: linear-gradient(160deg, var(--emerald-soft), var(--emerald));
+  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, .95);
+  cursor: pointer;
+  transition: transform .2s ease, background .25s ease;
 }
 
-.submitSearch:hover {
-  background-color: rgb(196, 216, 216);
-}
-.submitSearch:hover img {
-  scale: 130%;
-}
-
-@media screen and (width <= 800px) {
-  .main-container {
-    grid-template-columns: 1fr;
-  }
-
-  .left-container {
-    order: 2;
-    max-height: 50svh;
-    margin-bottom: 1.5rem;
-    overflow: scroll;
-    -ms-overflow-style: none; /*Ie and Edge */
-    scrollbar-width: none;
-  }
-
-  .left-container::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
-  }
-
-  .right {
-    margin-top: -5em;
-    order: 1;
-  }
+.submitSearch img {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);       /* force white icon */
+  transition: transform .2s ease, filter .2s ease;
 }
 
-@media screen and (width <= 580px) {
-  .main-container {
-    display: flex;
-    justify-content: center;
+.submitSearch:hover  { background: linear-gradient(160deg, var(--gold-2), var(--gold)); }
+.submitSearch:hover img { transform: scale(1.12); filter: brightness(0); }
+.submitSearch:active { transform: scale(.94); }
+
+.submitSearch:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.hint {
+  text-align: center;
+  font-size: .72rem;
+  letter-spacing: .03em;
+  color: rgba(249, 245, 234, .5);
+}
+
+/* ============================================================
+   LEFT  —  hadith card
+   ============================================================ */
+
+.left {
+  order: 2;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+.left-container {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 100%);
+  border: 1px solid rgba(201, 162, 39, .55);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: box-shadow .3s ease;
+}
+
+/* inner gold frame */
+.left-container::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(201, 162, 39, .32);
+  border-radius: calc(var(--r-lg) - 10px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.left-container.glow {
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, .5), var(--shadow-card);
+}
+
+.hadith-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 30px 24px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 162, 39, .55) transparent;
+}
+
+.hadith-scroll::-webkit-scrollbar { width: 8px; }
+.hadith-scroll::-webkit-scrollbar-track { background: transparent; }
+.hadith-scroll::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 39, .45);
+  border-radius: 99px;
+}
+.hadith-scroll::-webkit-scrollbar-thumb:hover { background: rgba(201, 162, 39, .7); }
+
+.hadith-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: opacity .4s ease, transform .4s ease;
+}
+
+.hadith-body.is-fading {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* ornament divider */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--gold);
+}
+
+.ornament .line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, .75), transparent);
+}
+
+.ornament .rub {
+  font-family: var(--font-ar);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* hadith text */
+.hadist {
+  font-family: var(--font-read);
+  font-size: clamp(1.02rem, 2.4vw, 1.24rem);
+  line-height: 1.95;
+  letter-spacing: .01em;
+  color: var(--ink);
+  text-align: left;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+/* attribution */
+.imam-row {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px dashed rgba(201, 162, 39, .5);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.imam {
+  position: relative;
+  font-family: var(--font-ui);
+  font-size: .84rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--emerald-soft);
+  text-align: right;
+}
+
+.imam::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  vertical-align: middle;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* --- Tablet / desktop: two columns --- */
+@media (min-width: 900px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr);
+    align-items: center;
+    gap: clamp(20px, 3vw, 46px);
+    padding: clamp(22px, 3vw, 42px);
   }
 
-  .left {
-    display: none;
+  .left  { order: 1; height: 100%; align-items: center; }
+  .right { order: 2; }
+
+  .left-container { max-height: min(86dvh, 780px); }
+
+  .right-container { gap: 18px; padding: 26px; }
+
+  .time-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 16px 18px;
+  }
+
+  .time { font-size: clamp(2.2rem, 4vw, 3rem); }
+
+  .date { text-align: left; font-size: .9rem; }
+  .date-long  { display: block; }
+  .date-short { display: none; }
+
+  .hadith-scroll { padding: 44px 48px 36px; }
+  .hadist { font-size: clamp(1.12rem, 1.35vw, 1.35rem); line-height: 2.05; }
+}
+
+/* --- Small phones --- */
+@media (max-width: 400px) {
+  .layout { gap: 10px; padding: 10px; }
+  .right-container { padding: 13px; gap: 10px; }
+  .time-container { padding: 10px 13px; }
+  .hadith-scroll { padding: 24px 18px 20px; }
+  .search-container { padding-left: 15px; }
+  .submitSearch { width: 42px; height: 42px; }
+  .submitSearch img { width: 18px; height: 18px; }
+}
+
+/* --- Landscape phones (short screens) --- */
+@media (orientation: landscape) and (max-height: 560px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+  }
+
+  .left  { order: 1; height: 100%; align-items: center; }
+  .right { order: 2; }
+
+  .brand, .hint { display: none; }
+  .right-container { padding: 14px; gap: 10px; }
+  .time-container { padding: 10px 14px; }
+  .time { font-size: 1.5rem; }
+  .date { font-size: .75rem; }
+  .hadith-scroll { padding: 22px 22px 18px; }
+  .left-container { max-height: calc(100dvh - 24px); }
+}
+
+/* --- Accessibility --- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
   }
 }
 
 .prevent-select {
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
