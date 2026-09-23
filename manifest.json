@@ -18,6 +18,6 @@
   },
 
   "chrome_url_overrides": {
-    "newtab": "main.html"
+    "newtab": "index.html"
   }
 }
