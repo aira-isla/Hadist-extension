@@ -14,21 +14,13 @@ Ekstensi browser yang menampilkan hadis pilihan setiap kali kamu membuka tab bar
 - 🕐 Jam & tanggal real-time
 - 🔍 Kotak pencarian — kosongkan kolom & tekan tombol untuk hadis acak
 - 🌙 Tema gelap yang nyaman di mata
+- 🌐  Support mode offline
 
 ---
 
 ## 📦 Cara Instalasi
 
 ### 1. Unduh Source Code
-
-**Opsi A — Via Git  :**
-
-```bash
-git clone https://github.com/<username>/<nama-repo>.git
-cd <nama-repo>
-```
-
-**Opsi B — Via ZIP:**
 
 1. Buka halaman repo di GitHub
 2. Klik tombol **Code** → **Download ZIP**
@@ -38,25 +30,8 @@ cd <nama-repo>
 
 ### 2. Instalasi di Mozilla Firefox
 
-> **Persyaratan:** Firefox versi **142 atau lebih baru** (sesuai `strict_min_version` pada manifest).
-
-1. Buka Firefox, lalu ketik di address bar:
-
-   ```
-   about:debugging#/runtime/this-firefox
-   ```
-
-2. Klik tombol **Load Temporary Add-on…**
-3. Arahkan ke folder hasil ekstrak, lalu pilih file **`manifest.json`**
-4. Ekstensi langsung aktif. Buka tab baru (`Ctrl + T`) untuk mencobanya.
-
-> ⚠️ **Catatan:** Karena dimuat sebagai *temporary add-on*, ekstensi akan hilang saat Firefox ditutup.
->
-> Untuk instalasi permanen, pilih salah satu:
->
-> - Tandatangani ekstensi lewat [addons.mozilla.org](https://addons.mozilla.org/developers/) (self-distribution), **atau**
-> - Gunakan Firefox Developer Edition / Nightly, lalu set `xpinstall.signatures.required` ke `false` di `about:config`, **atau**
-> - Jika repo ini menyediakan file `.xpi` di halaman **Releases**, drag-and-drop file tersebut ke jendela Firefox.
+1. ubah / ganti nama .zip ke .xpi
+2. tarik file xpi ke browser Firefox
 
 ---
 
@@ -72,6 +47,16 @@ Berlaku untuk **Google Chrome, Microsoft Edge, Brave, Opera, Vivaldi**, dll.
 3. Klik tombol **Load unpacked**.
 4. Pilih **folder hasil ekstrak** (folder yang berisi `manifest.json`).
 5. Ekstensi terpasang. Buka tab baru (`Ctrl + T`) — halaman *Daily Hadist* akan tampil.
+
+### 3. Instalasi di Browser Quetta (android)
+
+
+1. Buka halaman pengaturan
+2. Pilih Extension 
+3. Klik tombol  Developer option
+4. Klik (from .zip/.crx/.user.js)
+5. Pilih / cari zip hasil download dari github
+6. Kembali ke menu home dan refresh
 
 > ⚠️ **Catatan:**
 >
