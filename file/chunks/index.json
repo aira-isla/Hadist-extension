@@ -1,0 +1,107 @@
+{
+  "abu-daud": {
+    "totalLength": 4419,
+    "chunkSize": 500,
+    "chunks": [
+      "abu-daud_chunk_0.json",
+      "abu-daud_chunk_1.json",
+      "abu-daud_chunk_2.json",
+      "abu-daud_chunk_3.json",
+      "abu-daud_chunk_4.json",
+      "abu-daud_chunk_5.json",
+      "abu-daud_chunk_6.json",
+      "abu-daud_chunk_7.json",
+      "abu-daud_chunk_8.json"
+    ]
+  },
+  "ahmad": {
+    "totalLength": 4305,
+    "chunkSize": 500,
+    "chunks": [
+      "ahmad_chunk_0.json",
+      "ahmad_chunk_1.json",
+      "ahmad_chunk_2.json",
+      "ahmad_chunk_3.json",
+      "ahmad_chunk_4.json",
+      "ahmad_chunk_5.json",
+      "ahmad_chunk_6.json",
+      "ahmad_chunk_7.json",
+      "ahmad_chunk_8.json"
+    ]
+  },
+  "bukhari": {
+    "totalLength": 6638,
+    "chunkSize": 500,
+    "chunks": [
+      "bukhari_chunk_0.json",
+      "bukhari_chunk_1.json",
+      "bukhari_chunk_2.json",
+      "bukhari_chunk_3.json",
+      "bukhari_chunk_4.json",
+      "bukhari_chunk_5.json",
+      "bukhari_chunk_6.json",
+      "bukhari_chunk_7.json",
+      "bukhari_chunk_8.json",
+      "bukhari_chunk_9.json",
+      "bukhari_chunk_10.json",
+      "bukhari_chunk_11.json",
+      "bukhari_chunk_12.json",
+      "bukhari_chunk_13.json"
+    ]
+  },
+  "ibnu-majah": {
+    "totalLength": 4285,
+    "chunkSize": 500,
+    "chunks": [
+      "ibnu-majah_chunk_0.json",
+      "ibnu-majah_chunk_1.json",
+      "ibnu-majah_chunk_2.json",
+      "ibnu-majah_chunk_3.json",
+      "ibnu-majah_chunk_4.json",
+      "ibnu-majah_chunk_5.json",
+      "ibnu-majah_chunk_6.json",
+      "ibnu-majah_chunk_7.json",
+      "ibnu-majah_chunk_8.json"
+    ]
+  },
+  "malik": {
+    "totalLength": 1587,
+    "chunkSize": 500,
+    "chunks": [
+      "malik_chunk_0.json",
+      "malik_chunk_1.json",
+      "malik_chunk_2.json",
+      "malik_chunk_3.json"
+    ]
+  },
+  "muslim": {
+    "totalLength": 4930,
+    "chunkSize": 500,
+    "chunks": [
+      "muslim_chunk_0.json",
+      "muslim_chunk_1.json",
+      "muslim_chunk_2.json",
+      "muslim_chunk_3.json",
+      "muslim_chunk_4.json",
+      "muslim_chunk_5.json",
+      "muslim_chunk_6.json",
+      "muslim_chunk_7.json",
+      "muslim_chunk_8.json",
+      "muslim_chunk_9.json"
+    ]
+  },
+  "tirmidzi": {
+    "totalLength": 3625,
+    "chunkSize": 500,
+    "chunks": [
+      "tirmidzi_chunk_0.json",
+      "tirmidzi_chunk_1.json",
+      "tirmidzi_chunk_2.json",
+      "tirmidzi_chunk_3.json",
+      "tirmidzi_chunk_4.json",
+      "tirmidzi_chunk_5.json",
+      "tirmidzi_chunk_6.json",
+      "tirmidzi_chunk_7.json"
+    ]
+  }
+}
