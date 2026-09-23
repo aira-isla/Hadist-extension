@@ -1,6 +1,7 @@
 # Daily Hadist  (support offline mode)
 
 Ekstensi browser yang menampilkan hadis pilihan setiap kali kamu membuka tab baru atau me-refresh tab. Dilengkapi jam real-time dan kotak pencarian. **Stay halal.**
+*contoh [Demo](https://aira-isla.github.io/Hadist-main/).*
 
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue)
 ![Firefox](https://img.shields.io/badge/Firefox-142%2B-orange)
