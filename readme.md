@@ -108,6 +108,6 @@ Lihat file `LICENSE` pada repositori ini untuk detail lisensi.
 
 ## 👤 Author
 
-**Dev Outpost** — `dailyhadist@devoutpost.com`
+**aira-isla** — `https://github.com/aira-isla`
 
 > _Stay halal._ 🕌
