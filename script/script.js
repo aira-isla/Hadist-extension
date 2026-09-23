@@ -4,61 +4,62 @@
    ============================================================ */
 
 /* ------------------------------------------------------------
-   1. Clock & date
+   1. Clock — 24 jam, format Indonesia
    ------------------------------------------------------------ */
 
-class MainFunc {
-  constructor(root) {
-    this.root = root;
-    this.timeEl = root.querySelector('.time');
-    this.longEl = root.querySelector('.date-long');
-    this.shortEl = root.querySelector('.date-short');
-    this.timer = null;
-  }
+const clockHourEl = document.getElementById('clockHour');
+const clockMinuteEl = document.getElementById('clockMinute');
+const clockSecondsEl = document.getElementById('clockSeconds');
+const clockDayEl = document.getElementById('clockDay');
+const clockDateEl = document.getElementById('clockDate');
+const clockColonEl = document.getElementById('clockColon');
 
-  start() {
-    this.render();
-    this.timer = setInterval(() => this.render(), 1000);
-  }
+const pad2 = (n) => String(n).padStart(2, '0');
 
-  stop() {
-    clearInterval(this.timer);
-  }
+/* --- teks jam & tanggal (update tiap detik) --- */
 
-  render() {
-    const now = new Date();
+function renderClock() {
+  const now = new Date();
 
-    let hours = now.getHours();
-    const period = hours < 12 ? 'AM' : 'PM';
-    hours = hours % 12 || 12;
+  clockHourEl.textContent = pad2(now.getHours());
+  clockMinuteEl.textContent = pad2(now.getMinutes());
+  clockSecondsEl.textContent = pad2(now.getSeconds());
 
-    const minutes = String(now.getMinutes()).padStart(2, '0');
+  /* Tanggal Indonesia: "Selasa" + "23 September 2026" */
+  clockDayEl.textContent = now.toLocaleDateString('id-ID', {
+    weekday: 'long',
+  });
 
-    // rebuild the clock node so the AM/PM tag keeps its styling
-    this.timeEl.textContent = `${hours}:${minutes}`;
-
-    const periodEl = document.createElement('span');
-    periodEl.className = 'time-period';
-    periodEl.textContent = period;
-    this.timeEl.appendChild(periodEl);
-
-    this.longEl.textContent = now.toLocaleDateString(undefined, {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-
-    this.shortEl.textContent = now.toLocaleDateString(undefined, {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-    });
-  }
+  clockDateEl.textContent = now.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
-const clock = new MainFunc(document.querySelector('.time-container'));
-clock.start();
+/* Self-correcting tick — selalu jatuh tepat di pergantian detik */
+function startClock() {
+  renderClock();
+  const delay = 1000 - (Date.now() % 1000);
+  setTimeout(startClock, delay);
+}
+
+/* --- titik dua: berkedip 2x lebih cepat (500ms on / 500ms off) --- */
+
+function blinkColon() {
+  const phase = Math.floor(Date.now() / 500) % 2;
+  clockColonEl.classList.toggle('is-dim', phase === 1);
+}
+
+/* Self-correcting tick untuk kedipan — selalu jatuh di batas 500ms */
+function startColonBlink() {
+  blinkColon();
+  const delay = 500 - (Date.now() % 500);
+  setTimeout(startColonBlink, delay);
+}
+
+startClock();
+startColonBlink();
 
 /* ------------------------------------------------------------
    2. Random hadith
@@ -76,43 +77,37 @@ const IMAMS = [
   { key: 'tirmidzi', name: 'Tirmidzi' },
 ];
 
-const hadithBody = document.querySelector('.hadith-body');
-const hadithText = document.querySelector('.hadist');
-const hadithImam = document.querySelector('.imam');
-const hadithCard = document.querySelector('.left-container');
+const cardEl = document.querySelector('.quote-card');
+const textEl = document.getElementById('hadithText');
+const refEl = document.getElementById('hadithRef');
 
-let requestToken = 0; // guards against out-of-order responses
-let hasRendered = false; // first load skips the fade-out
+let requestToken = 0;
+let hasRendered = false;
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function showRandomHadith() {
   const token = ++requestToken;
   const imam = pick(IMAMS);
 
-  // kick the fetch off immediately so it overlaps the fade-out
   const bookPromise = hadisLoader.loadBook(imam.key);
 
   if (hasRendered) {
-    hadithBody.classList.add('is-fading');
-    await wait(240);
-  } else {
-    hadithText.textContent = 'Memuat hadis…';
-    hadithImam.textContent = '—';
+    cardEl.classList.add('is-fading');
+    await wait(220);
   }
 
   try {
     const book = await bookPromise;
-
-    if (token !== requestToken) return; // a newer request took over
+    if (token !== requestToken) return;
 
     const entry = pick(book);
     const text = entry.id ?? entry.text ?? entry.hadith ?? '';
     const number = entry.number ?? entry.no ?? '';
 
-    hadithText.textContent = text || 'Hadis tidak tersedia.';
-    hadithImam.textContent = number
+    textEl.textContent = text || 'Hadis tidak tersedia.';
+    refEl.textContent = number
       ? `HR. Imam ${imam.name} No. ${number}`
       : `HR. Imam ${imam.name}`;
 
@@ -121,53 +116,42 @@ async function showRandomHadith() {
     if (token !== requestToken) return;
 
     console.error('Gagal memuat hadis:', error);
-    hadithText.textContent = 'Maaf, data hadis gagal dimuat.';
-    hadithImam.textContent = 'Periksa koneksi lalu coba lagi';
+    textEl.textContent = 'Maaf, data hadis gagal dimuat.';
+    refEl.textContent = 'Periksa koneksi lalu coba lagi';
   } finally {
     if (token === requestToken) {
-      requestAnimationFrame(() => hadithBody.classList.remove('is-fading'));
+      requestAnimationFrame(() => cardEl.classList.remove('is-fading'));
     }
   }
 }
 
 /* ------------------------------------------------------------
-   3. Search bar
+   3. Search + submit button
    ------------------------------------------------------------ */
 
-const query = document.querySelector('.search');
-const submitSearch = document.querySelector('.submitSearch');
+const searchInput = document.querySelector('.search-input');
+const searchSubmit = document.querySelector('.search-submit');
 
 function handleSubmit() {
-  const value = query.value.trim();
+  const value = searchInput.value.trim();
 
   if (value) {
     const url = 'https://www.google.com/search?q=' + encodeURIComponent(value);
     window.open(url, '_self');
-    query.value = '';
+    searchInput.value = '';
   } else {
-    showRandomHadith();
+    showRandomHadith(); /* empty input = new random hadith */
   }
 }
 
-query.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter') {
-    event.preventDefault();
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
     handleSubmit();
   }
 });
 
-submitSearch.addEventListener('click', handleSubmit);
-
-/* Desktop-only hover hint: empty input → highlight the hadith card */
-if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  submitSearch.addEventListener('mouseenter', () => {
-    if (!query.value.trim()) hadithCard.classList.add('glow');
-  });
-
-  submitSearch.addEventListener('mouseleave', () => {
-    hadithCard.classList.remove('glow');
-  });
-}
+searchSubmit.addEventListener('click', handleSubmit);
 
 /* ------------------------------------------------------------
    4. Boot

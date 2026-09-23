@@ -2,82 +2,73 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#02231d">
-    <meta name="description" content="Halal Search — pencarian & hadis pilihan">
-    <link rel="icon" type="image/x-icon" href="/icon/mosque.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600&family=Lora:wght@400;500&display=swap">
-    <link rel="stylesheet" href="script/style.css">
-    <title>Halal Search</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0f14">
+  <meta name="description" content="Halal Search — pencarian & hadis pilihan">
+  <link rel="icon" type="image/x-icon" href="/icon/mosque.png">
+  <link rel="stylesheet" href="script/style.css">
+  <title>Halal Search</title>
 </head>
 
 <body>
-    <div class="main-container">
-        <div class="layout">
+  <div class="main-container">
+    <div class="hero">
 
-            <!-- ==================== HADIS ==================== -->
-            <section class="left" aria-label="Hadis">
-                <div class="left-container">
-                    <div class="hadith-scroll">
-                        <div class="hadith-body">
-                            <div class="ornament" aria-hidden="true">
-                                <span class="line"></span>
-                                <span class="rub">۞</span>
-                                <span class="line"></span>
-                            </div>
-
-                            <p class="hadist">Memuat hadis…</p>
-
-                            <div class="imam-row">
-                                <h4 class="imam">—</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ==================== CLOCK + SEARCH ==================== -->
-            <section class="right">
-                <div class="right-container">
-
-                    <div class="brand">
-                        <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" fill="currentColor" />
-                        </svg>
-                        <span>Halal Search</span>
-                    </div>
-
-                    <div class="time-container prevent-select">
-                        <div class="time" data-period=""></div>
-                        <div class="date">
-                            <span class="date-long"></span>
-                            <span class="date-short"></span>
-                        </div>
-                    </div>
-
-                    <div class="search-container">
-                        <input class="search" type="search" spellcheck="false" placeholder="Cari sesuatu…"
-                            aria-label="Search" enterkeyhint="search" autocomplete="off">
-                        <button type="button" class="submitSearch prevent-select" aria-label="Cari / Hadis acak">
-                            <img src="./icon/MagnifyingGlass.svg" alt="">
-                        </button>
-                    </div>
-
-                    <p class="hint">Kosongkan kolom &amp; tekan tombol untuk hadis acak</p>
-
-                </div>
-            </section>
-
+      <!-- ============ Clock ============ -->
+      <div class="clock">
+        <div class="clock-display">
+          <span class="clock-time">
+            <span id="clockHour">--</span><span class="clock-colon" id="clockColon" aria-hidden="true">:</span><span id="clockMinute">--</span>
+          </span>
+          <span class="clock-seconds" id="clockSeconds">--</span>
         </div>
-    </div>
 
-    <script src="script/hadis-loader.js"></script>
-    <script src="script/script.js"></script>
+        <span class="clock-rule" aria-hidden="true"></span>
+
+        <div class="clock-date">
+          <span class="clock-day" id="clockDay">—</span>
+          <span class="clock-divider" aria-hidden="true"></span>
+          <span class="clock-full" id="clockDate">—</span>
+        </div>
+      </div>
+
+      <!-- ============ Search ============ -->
+      <div class="search">
+        <input
+          class="search-input"
+          type="search"
+          spellcheck="false"
+          placeholder="Cari sesuatu…"
+          enterkeyhint="search"
+          autocomplete="off"
+          aria-label="Kotak pencarian">
+        <button
+          type="button"
+          class="search-submit prevent-select"
+          aria-label="Cari / Hadis acak">
+          <img src="./icon/MagnifyingGlass.svg" alt="">
+        </button>
+      </div>
+
+      <p class="search-hint">Kosongkan kolom &amp; tekan tombol untuk hadis acak</p>
+
+      <!-- ============ Hadith ============ -->
+      <div class="quotes">
+        <div class="quote-card">
+          <div class="quote-scroll">
+            <p class="quote-text" id="hadithText">Memuat hadis…</p>
+            <p class="quote-character" id="hadithRef">—</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script/hadis-loader.js"></script>
+  <script src="script/script.js"></script>
 </body>
 
 </html>

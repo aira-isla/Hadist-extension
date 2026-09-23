@@ -1,449 +1,495 @@
-/* ============================================================
-   HALAL SEARCH — Islamic-inspired, responsive UI
-   Mobile-first · comfortable reading · warm cultural palette
-   ============================================================ */
-
-:root {
-  --deep: #02231d;
-  --deep-2: #01120f;
-  --emerald: #06403a;
-  --emerald-soft: #0b5a50;
-  --gold: #c9a227;
-  --gold-2: #e8cf8b;
-  --cream: #f9f5ea;
-  --cream-2: #efe7d5;
-  --ink: #12211e;
-  --ink-soft: #4a5a55;
-
-  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-read: 'Lora', Georgia, 'Times New Roman', serif;
-  --font-ar: 'Amiri', 'Times New Roman', serif;
-
-  --r-lg: 24px;
-  --r-md: 16px;
-  --r-pill: 999px;
-
-  --shadow-card: 0 24px 60px -28px rgba(0, 0, 0, .75);
-  --shadow-soft: 0 14px 34px -20px rgba(0, 0, 0, .9);
+@font-face {
+  font-family: 'digital';
+  src: url(DS-DIGII.TTF);
+  font-display: swap;
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 html, body { height: 100%; }
 
 body {
-  font-family: var(--font-ui);
-  background: var(--deep-2);
-  color: var(--cream);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0b0f14;
+  color: #e6edf3;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
-  text-rendering: optimizeLegibility;
 }
 
-/* ---------- Background ---------- */
+/* ============================================================
+   CONTAINER
+   ============================================================ */
 
 .main-container {
   position: relative;
   isolation: isolate;
-  width: 100%;
-  min-height: 100dvh;
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-  background:
-    radial-gradient(120% 80% at 50% -15%, rgba(201, 162, 39, .20), transparent 62%),
-    radial-gradient(90% 70% at 105% 105%, rgba(11, 90, 80, .55), transparent 70%),
-    linear-gradient(165deg, #052e27 0%, #02231d 45%, #01120f 100%);
-}
-
-/* subtle geometric star lattice */
-.main-container::before {
-  content: "";
-  position: absolute;
-  inset: -5%;
-  z-index: -1;
-  opacity: .14;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='64'%20height='64'%20viewBox='0%200%2064%2064'%3E%3Cg%20fill='none'%20stroke='%23c9a227'%20stroke-width='0.9'%3E%3Cpath%20d='M32%204l8%2020%2020%208-20%208-8%2020-8-20-20-8%2020-8z'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='3.5'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 64px 64px;
-}
-
-/* ---------- Layout shell ---------- */
-
-.layout {
-  width: 100%;
-  max-width: 1280px;
-  height: 100vh;
+  background-image: url(../file/1.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   height: 100dvh;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  align-items: center;
+  justify-content: center;
   padding:
-    max(14px, env(safe-area-inset-top))
-    max(14px, env(safe-area-inset-right))
-    max(14px, env(safe-area-inset-bottom))
-    max(14px, env(safe-area-inset-left));
+    max(1.5rem, env(safe-area-inset-top))
+    max(1.5rem, env(safe-area-inset-right))
+    max(1.5rem, env(safe-area-inset-bottom))
+    max(1.5rem, env(safe-area-inset-left));
 }
 
-/* ============================================================
-   RIGHT  —  brand · clock · search
-   ============================================================ */
+.main-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .30), rgba(0, 0, 0, .72));
+  z-index: -1;
+  pointer-events: none;
+}
 
-.right {
-  order: 1;
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 760px;
   flex: 0 0 auto;
 }
 
-.right-container {
-  display: flex;
+/* ============================================================
+   CLOCK — 24 jam · format Indonesia
+   ============================================================ */
+
+.clock {
+  position: relative;
+  display: inline-flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border-radius: var(--r-lg);
-  background: linear-gradient(180deg, rgba(6, 64, 58, .74), rgba(2, 35, 29, .86));
-  border: 1px solid rgba(201, 162, 39, .26);
-  box-shadow: var(--shadow-card);
-  -webkit-backdrop-filter: blur(14px);
+  align-items: center;
+  gap: .6rem;
+  padding: 1rem 1.9rem 1.05rem;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(15, 23, 32, .78), rgba(11, 17, 24, .70));
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, .10);
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, .45),
+    inset 0 1px 0 rgba(255, 255, 255, .05);
+  color: #bbf2ff;
+  flex: 0 0 auto;
+  overflow: hidden;
 }
 
-/* brand */
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: .72rem;
-  font-weight: 600;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--gold-2);
+/* garis cahaya tipis di tepi atas */
+.clock::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(142, 202, 230, .55), transparent);
+  pointer-events: none;
 }
 
-.brand-icon { width: 18px; height: 18px; color: var(--gold); flex: none; }
+/* --- baris jam --- */
 
-/* clock */
-.time-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 12px 16px;
-  border-radius: var(--r-md);
-  background: rgba(1, 18, 15, .58);
-  border: 1px solid rgba(201, 162, 39, .20);
-}
-
-.time {
+.clock-display {
   display: inline-flex;
   align-items: baseline;
-  gap: .14em;
-  font-weight: 600;
-  font-size: clamp(1.6rem, 7vw, 2.35rem);
+  gap: .55rem;
+}
+
+.clock-time {
+  font-family: 'digital', monospace;
+  font-size: clamp(2.2rem, 7vw, 3.1rem);
   line-height: 1;
-  letter-spacing: .01em;
-  color: #fff;
+  letter-spacing: 2px;
+  color: #d9f6ff;
+  text-shadow:
+    0 0 18px rgba(187, 242, 255, .55),
+    0 0 42px rgba(76, 154, 255, .22);
   font-variant-numeric: tabular-nums;
 }
 
-.time-period {
-  font-size: .38em;
-  font-weight: 600;
-  letter-spacing: .14em;
-  color: var(--gold);
+/* Titik dua: dikendalikan JS agar sinkron dengan detik */
+.clock-colon {
+  display: inline-block;
+  margin: 0 .04em;
+  opacity: 1;
+  transition: opacity .18s ease;
 }
 
-.date {
-  flex: 1 1 auto;
-  text-align: right;
-  font-family: var(--font-read);
-  font-style: italic;
-  font-size: .82rem;
-  line-height: 1.35;
-  color: rgba(232, 207, 139, .88);
+.clock-colon.is-dim {
+  opacity: .18;
 }
 
-.date-short { display: block; }
-.date-long  { display: none; }
+.clock-seconds {
+  font-family: 'digital', monospace;
+  font-size: clamp(.95rem, 2.4vw, 1.25rem);
+  line-height: 1;
+  letter-spacing: 1.5px;
+  color: #8ecae6;
+  opacity: .9;
+  font-variant-numeric: tabular-nums;
+}
 
-/* search */
-.search-container {
-  display: flex;
+/* --- pemisah --- */
+
+.clock-rule {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(142, 202, 230, .30), transparent);
+}
+
+/* --- baris tanggal --- */
+
+.clock-date {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 6px 6px 18px;
-  border-radius: var(--r-pill);
-  background: rgba(249, 245, 234, .97);
-  border: 1px solid rgba(201, 162, 39, .38);
-  box-shadow: var(--shadow-soft);
-  transition: box-shadow .25s ease, border-color .25s ease;
+  justify-content: center;
+  gap: .6rem;
+  font-size: clamp(.72rem, 1.7vw, .82rem);
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #a0c4d4;
+  white-space: nowrap;
 }
 
-.search-container:focus-within {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 4px rgba(201, 162, 39, .22), var(--shadow-soft);
+.clock-day {
+  color: #bbf2ff;
+  font-weight: 600;
+  text-shadow: 0 0 12px rgba(187, 242, 255, .25);
 }
+
+.clock-divider {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(142, 202, 230, .60);
+  flex: none;
+}
+
+/* ============================================================
+   SEARCH — pill input + circular submit button
+   ============================================================ */
 
 .search {
+  width: 100%;
+  max-width: 620px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .35rem .35rem .35rem 1.4rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 32, .60);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, .15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .30);
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  flex: 0 0 auto;
+}
+
+.search:focus-within {
+  border-color: #4c9aff;
+  background: rgba(15, 23, 32, .85);
+  box-shadow:
+    0 0 0 4px rgba(76, 154, 255, .20),
+    0 8px 20px rgba(0, 0, 0, .40);
+}
+
+.search input {
   flex: 1 1 auto;
   min-width: 0;
   border: none;
   outline: none;
   background: transparent;
-  font-family: var(--font-ui);
-  font-size: 1rem;
-  color: var(--ink);
-  padding: 12px 0;
+  color: #e6edf3;
+  font-size: 1.05rem;
+  padding: .85rem 0;
   -webkit-appearance: none;
   appearance: none;
 }
 
-.search::placeholder { color: #8b9a95; }
-.search::-webkit-search-cancel-button { -webkit-appearance: none; }
+.search input::placeholder {
+  color: rgba(230, 237, 243, .50);
+}
 
-.submitSearch {
+.search input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.search-submit {
   flex: none;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
   border: none;
   border-radius: 50%;
-  background: linear-gradient(160deg, var(--emerald-soft), var(--emerald));
-  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, .95);
+  background: linear-gradient(160deg, #1d3a5c, #0f2540);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .45);
   cursor: pointer;
   transition: transform .2s ease, background .25s ease;
 }
 
-.submitSearch img {
+.search-submit img {
   width: 20px;
   height: 20px;
-  filter: brightness(0) invert(1);       /* force white icon */
+  filter: brightness(0) invert(1);
   transition: transform .2s ease, filter .2s ease;
 }
 
-.submitSearch:hover  { background: linear-gradient(160deg, var(--gold-2), var(--gold)); }
-.submitSearch:hover img { transform: scale(1.12); filter: brightness(0); }
-.submitSearch:active { transform: scale(.94); }
+.search-submit:hover {
+  background: linear-gradient(160deg, #4c9aff, #2c6fd1);
+}
+.search-submit:hover img { transform: scale(1.12); }
 
-.submitSearch:focus-visible {
-  outline: 3px solid var(--gold);
+.search-submit:active { transform: scale(.92); }
+
+.search-submit:focus-visible {
+  outline: 3px solid #4c9aff;
   outline-offset: 2px;
 }
 
-.hint {
+.search-hint {
   text-align: center;
-  font-size: .72rem;
+  font-size: .75rem;
   letter-spacing: .03em;
-  color: rgba(249, 245, 234, .5);
+  color: #e6edf3;
+  flex: 0 0 auto;
+  margin-top: -.35rem;
 }
 
 /* ============================================================
-   LEFT  —  hadith card
+   QUOTE CARD (hadith)
    ============================================================ */
 
-.left {
-  order: 2;
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-}
-
-.left-container {
+.quotes {
   position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
+  z-index: 1;
+  width: 100%;
+  max-width: 760px;
   display: flex;
-  border-radius: var(--r-lg);
-  background: linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 100%);
-  border: 1px solid rgba(201, 162, 39, .55);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-  transition: box-shadow .3s ease;
+  justify-content: center;
+  flex: 0 0 auto;
 }
 
-/* inner gold frame */
-.left-container::before {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border: 1px solid rgba(201, 162, 39, .32);
-  border-radius: calc(var(--r-lg) - 10px);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.left-container.glow {
-  box-shadow: 0 0 0 3px rgba(201, 162, 39, .5), var(--shadow-card);
-}
-
-.hadith-scroll {
-  flex: 1 1 auto;
-  min-height: 0;
+.quote-card {
+  position: relative;
+  width: 100%;
   display: flex;
   flex-direction: column;
+  background: rgba(15, 23, 32, .72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, .10);
+  border-radius: 22px;
+  padding: 1.75rem 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .45);
+  color: #e6edf3;
+  overflow: hidden;
+  transition: opacity .3s ease, transform .3s ease;
+  max-height: min(70dvh, 720px);
+}
+
+.quote-card.is-fading {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.quote-scroll {
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  padding: 30px 24px 24px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(201, 162, 39, .55) transparent;
+  scrollbar-color: rgba(255, 255, 255, .20) transparent;
+  padding-right: .5rem;
 }
 
-.hadith-scroll::-webkit-scrollbar { width: 8px; }
-.hadith-scroll::-webkit-scrollbar-track { background: transparent; }
-.hadith-scroll::-webkit-scrollbar-thumb {
-  background: rgba(201, 162, 39, .45);
+.quote-scroll::-webkit-scrollbar { width: 6px; }
+.quote-scroll::-webkit-scrollbar-track { background: transparent; }
+.quote-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .18);
   border-radius: 99px;
 }
-.hadith-scroll::-webkit-scrollbar-thumb:hover { background: rgba(201, 162, 39, .7); }
-
-.hadith-body {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  transition: opacity .4s ease, transform .4s ease;
+.quote-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, .32);
 }
 
-.hadith-body.is-fading {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-/* ornament divider */
-.ornament {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--gold);
-}
-
-.ornament .line {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, .75), transparent);
-}
-
-.ornament .rub {
-  font-family: var(--font-ar);
-  font-size: 1.15rem;
-  line-height: 1;
-}
-
-/* hadith text */
-.hadist {
-  font-family: var(--font-read);
-  font-size: clamp(1.02rem, 2.4vw, 1.24rem);
-  line-height: 1.95;
-  letter-spacing: .01em;
-  color: var(--ink);
+.quote-text {
+  font-size: clamp(1rem, 1.6vw, 1.18rem);
+  font-weight: 400;
+  line-height: 1.8;
+  color: #d6e4f0;
   text-align: left;
-  text-wrap: pretty;
+  white-space: pre-line;
   overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
-/* attribution */
-.imam-row {
-  margin-top: auto;
-  padding-top: 18px;
-  border-top: 1px dashed rgba(201, 162, 39, .5);
-  display: flex;
-  justify-content: flex-end;
-}
-
-.imam {
-  position: relative;
-  font-family: var(--font-ui);
-  font-size: .84rem;
-  font-weight: 600;
-  letter-spacing: .04em;
-  color: var(--emerald-soft);
+.quote-character {
+  display: block;
+  margin-top: .9rem;
+  padding-top: .85rem;
+  border-top: 1px dashed rgba(255, 255, 255, .12);
+  font-size: clamp(.82rem, 1.8vw, .95rem);
+  font-weight: 500;
+  color: #8ecae6;
+  font-style: italic;
   text-align: right;
-}
-
-.imam::before {
-  content: "";
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-right: 8px;
-  border-radius: 50%;
-  background: var(--gold);
-  vertical-align: middle;
 }
 
 /* ============================================================
    RESPONSIVE
    ============================================================ */
 
-/* --- Tablet / desktop: two columns --- */
 @media (min-width: 900px) {
-  .layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr);
-    align-items: center;
-    gap: clamp(20px, 3vw, 46px);
-    padding: clamp(22px, 3vw, 42px);
+  .main-container { padding: 2rem; }
+
+  .hero {
+    gap: 1.15rem;
+    max-width: 880px;
   }
 
-  .left  { order: 1; height: 100%; align-items: center; }
-  .right { order: 2; }
+  .quotes { max-width: 880px; }
 
-  .left-container { max-height: min(86dvh, 780px); }
-
-  .right-container { gap: 18px; padding: 26px; }
-
-  .time-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 16px 18px;
+  .quote-card {
+    padding: 2.25rem 2.75rem;
+    border-radius: 24px;
+    max-height: min(72dvh, 780px);
   }
 
-  .time { font-size: clamp(2.2rem, 4vw, 3rem); }
+  .quote-text {
+    font-size: 1.18rem;
+    line-height: 1.9;
+  }
 
-  .date { text-align: left; font-size: .9rem; }
-  .date-long  { display: block; }
-  .date-short { display: none; }
+  .search { max-width: 680px; }
 
-  .hadith-scroll { padding: 44px 48px 36px; }
-  .hadist { font-size: clamp(1.12rem, 1.35vw, 1.35rem); line-height: 2.05; }
+  .clock { padding: 1.1rem 2.2rem 1.15rem; border-radius: 22px; }
 }
 
-/* --- Small phones --- */
-@media (max-width: 400px) {
-  .layout { gap: 10px; padding: 10px; }
-  .right-container { padding: 13px; gap: 10px; }
-  .time-container { padding: 10px 13px; }
-  .hadith-scroll { padding: 24px 18px 20px; }
-  .search-container { padding-left: 15px; }
-  .submitSearch { width: 42px; height: 42px; }
-  .submitSearch img { width: 18px; height: 18px; }
+@media (min-width: 1440px) {
+  .hero { max-width: 980px; }
+  .quotes { max-width: 980px; }
+
+  .quote-card {
+    padding: 2.5rem 3rem;
+    max-height: min(75dvh, 860px);
+  }
+
+  .quote-text {
+    font-size: 1.22rem;
+    line-height: 1.95;
+  }
+
+  .search { max-width: 720px; }
 }
 
-/* --- Landscape phones (short screens) --- */
+@media (max-width: 600px) {
+  .main-container {
+    padding:
+      max(1rem, env(safe-area-inset-top))
+      max(1rem, env(safe-area-inset-right))
+      max(1rem, env(safe-area-inset-bottom))
+      max(1rem, env(safe-area-inset-left));
+  }
+
+  .hero { gap: .85rem; max-width: 100%; }
+
+  .clock {
+    gap: .45rem;
+    padding: .85rem 1.35rem .9rem;
+    border-radius: 16px;
+  }
+  .clock-time { font-size: 2.1rem; letter-spacing: 1.5px; }
+  .clock-seconds { font-size: .9rem; }
+  .clock-date { font-size: .68rem; letter-spacing: .12em; gap: .5rem; }
+
+  .search { padding: .3rem .3rem .3rem 1.1rem; }
+  .search input { padding: .75rem 0; font-size: 1rem; }
+  .search-submit { width: 40px; height: 40px; }
+  .search-submit img { width: 18px; height: 18px; }
+
+  .search-hint { font-size: .7rem; }
+
+  .quote-card {
+    padding: 1.25rem 1.25rem;
+    border-radius: 18px;
+    max-height: 65dvh;
+  }
+  .quote-text { font-size: 1rem; line-height: 1.7; }
+}
+
+@media (max-width: 380px) {
+  .clock { padding: .7rem 1.05rem .75rem; gap: .4rem; }
+  .clock-time { font-size: 1.85rem; letter-spacing: 1.2px; }
+  .clock-seconds { font-size: .8rem; letter-spacing: 1px; }
+  .clock-date { font-size: .6rem; letter-spacing: .1em; gap: .4rem; }
+  .clock-divider { width: 2px; height: 2px; }
+
+  .search { padding-left: 1rem; }
+  .search-submit { width: 36px; height: 36px; }
+  .search-submit img { width: 16px; height: 16px; }
+
+  .search-hint { font-size: .65rem; }
+
+  .quote-card { padding: 1.1rem 1rem; max-height: 60dvh; }
+  .quote-text { font-size: .92rem; line-height: 1.65; }
+}
+
 @media (orientation: landscape) and (max-height: 560px) {
-  .layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  .main-container { padding: .75rem; }
+
+  .hero { gap: .55rem; max-width: 100%; }
+
+  /* jam jadi satu baris: waktu · pemisah · tanggal */
+  .clock {
+    flex-direction: row;
     align-items: center;
-    gap: 14px;
-    padding: 12px;
+    gap: .95rem;
+    padding: .55rem 1.2rem;
+    border-radius: 14px;
   }
+  .clock-display { gap: .45rem; }
+  .clock-time { font-size: 1.6rem; letter-spacing: 1.2px; }
+  .clock-seconds { font-size: .75rem; }
+  .clock-rule {
+    width: 1px;
+    height: 26px;
+    background: linear-gradient(180deg, transparent, rgba(142, 202, 230, .35), transparent);
+  }
+  .clock-date { font-size: .62rem; letter-spacing: .1em; gap: .45rem; }
 
-  .left  { order: 1; height: 100%; align-items: center; }
-  .right { order: 2; }
+  .search { padding: .25rem .25rem .25rem .9rem; }
+  .search input { padding: .55rem 0; font-size: .9rem; }
+  .search-submit { width: 34px; height: 34px; }
+  .search-submit img { width: 15px; height: 15px; }
 
-  .brand, .hint { display: none; }
-  .right-container { padding: 14px; gap: 10px; }
-  .time-container { padding: 10px 14px; }
-  .time { font-size: 1.5rem; }
-  .date { font-size: .75rem; }
-  .hadith-scroll { padding: 22px 22px 18px; }
-  .left-container { max-height: calc(100dvh - 24px); }
+  .search-hint { display: none; }
+
+  .quote-card {
+    padding: .9rem 1.1rem;
+    border-radius: 14px;
+    max-height: 60dvh;
+  }
+  .quote-text { font-size: .88rem; line-height: 1.55; }
+  .quote-character { font-size: .75rem; margin-top: .6rem; padding-top: .5rem; }
 }
 
-/* --- Accessibility --- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
