@@ -1,11 +1,9 @@
 /* ============================================================
    script.js — Halal Search
-   Clock · random hadith · search
+   Clock · random hadith · search · idle warm-up
    ============================================================ */
 
-/* ------------------------------------------------------------
-   1. Clock — 24 jam, format Indonesia
-   ------------------------------------------------------------ */
+/* ---------- 1. Clock ---------- */
 
 const clockHourEl = document.getElementById('clockHour');
 const clockMinuteEl = document.getElementById('clockMinute');
@@ -16,56 +14,60 @@ const clockColonEl = document.getElementById('clockColon');
 
 const pad2 = (n) => String(n).padStart(2, '0');
 
-/* --- teks jam & tanggal (update tiap detik) --- */
+const dateFmt = new Intl.DateTimeFormat('id-ID', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const dayFmt = new Intl.DateTimeFormat('id-ID', { weekday: 'long' });
+
+let clockTimer = null;
+let colonTimer = null;
 
 function renderClock() {
   const now = new Date();
-
   clockHourEl.textContent = pad2(now.getHours());
   clockMinuteEl.textContent = pad2(now.getMinutes());
   clockSecondsEl.textContent = pad2(now.getSeconds());
-
-  /* Tanggal Indonesia: "Selasa" + "23 September 2026" */
-  clockDayEl.textContent = now.toLocaleDateString('id-ID', {
-    weekday: 'long',
-  });
-
-  clockDateEl.textContent = now.toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  clockDayEl.textContent = dayFmt.format(now);
+  clockDateEl.textContent = dateFmt.format(now);
 }
 
-/* Self-correcting tick — selalu jatuh tepat di pergantian detik */
-function startClock() {
+function tickClock() {
   renderClock();
-  const delay = 1000 - (Date.now() % 1000);
-  setTimeout(startClock, delay);
+  clockTimer = setTimeout(tickClock, 1000 - (Date.now() % 1000));
 }
 
-/* --- titik dua: berkedip 2x lebih cepat (500ms on / 500ms off) --- */
-
-function blinkColon() {
-  const phase = Math.floor(Date.now() / 500) % 2;
-  clockColonEl.classList.toggle('is-dim', phase === 1);
+function tickColon() {
+  const dim = Math.floor(Date.now() / 500) % 2 === 1;
+  clockColonEl.classList.toggle('is-dim', dim);
+  colonTimer = setTimeout(tickColon, 500 - (Date.now() % 500));
 }
 
-/* Self-correcting tick untuk kedipan — selalu jatuh di batas 500ms */
-function startColonBlink() {
-  blinkColon();
-  const delay = 500 - (Date.now() % 500);
-  setTimeout(startColonBlink, delay);
+function startClock() {
+  if (clockTimer) return;
+  renderClock();
+  tickClock();
+  tickColon();
 }
+
+function stopClock() {
+  clearTimeout(clockTimer);
+  clockTimer = null;
+  clearTimeout(colonTimer);
+  colonTimer = null;
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopClock();
+  else startClock();
+});
 
 startClock();
-startColonBlink();
 
-/* ------------------------------------------------------------
-   2. Random hadith
-   ------------------------------------------------------------ */
+/* ---------- 2. Random hadith ---------- */
 
-const hadisLoader = new HadisLoader();
+const hadisLoader = new HadisLoader({ maxCachedChunks: 6 });
 
 const IMAMS = [
   { key: 'abu-daud', name: 'Abu-Daud' },
@@ -84,38 +86,41 @@ const refEl = document.getElementById('hadithRef');
 let requestToken = 0;
 let hasRendered = false;
 
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const pick = (arr) => arr[(Math.random() * arr.length) | 0];
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function showRandomHadith() {
   const token = ++requestToken;
   const imam = pick(IMAMS);
 
-  const bookPromise = hadisLoader.loadBook(imam.key);
+  const promise = hadisLoader.getRandomHadith(imam.key);
 
   if (hasRendered) {
     cardEl.classList.add('is-fading');
-    await wait(220);
+    await wait(180);
   }
 
-  try {
-    const book = await bookPromise;
-    if (token !== requestToken) return;
+ try {
+    const { entry, number } = await promise;
+    if (token !== requestToken) return; // superseded by a newer click
 
-    const entry = pick(book);
-    const text = entry.id ?? entry.text ?? entry.hadith ?? '';
-    const number = entry.number ?? entry.no ?? '';
+    console.log( {
+      imam: imam.name,
+      number,
+      text: entry.id,          // Indonesian
+      arabic: entry.arab,      // Arabic
+    });
 
+    const text = entry?.id ?? entry?.arab ?? '';
     textEl.textContent = text || 'Hadis tidak tersedia.';
-    refEl.textContent = number
+    refEl.textContent = (number !== '' && number != null)
       ? `HR. Imam ${imam.name} No. ${number}`
       : `HR. Imam ${imam.name}`;
 
     hasRendered = true;
-  } catch (error) {
+  }  catch (err) {
     if (token !== requestToken) return;
-
-    console.error('Gagal memuat hadis:', error);
+    console.error('Gagal memuat hadis:', err);
     textEl.textContent = 'Maaf, data hadis gagal dimuat.';
     refEl.textContent = 'Periksa koneksi lalu coba lagi';
   } finally {
@@ -125,22 +130,19 @@ async function showRandomHadith() {
   }
 }
 
-/* ------------------------------------------------------------
-   3. Search + submit button
-   ------------------------------------------------------------ */
+/* ---------- 3. Search ---------- */
 
 const searchInput = document.querySelector('.search-input');
 const searchSubmit = document.querySelector('.search-submit');
 
 function handleSubmit() {
   const value = searchInput.value.trim();
-
   if (value) {
-    const url = 'https://www.google.com/search?q=' + encodeURIComponent(value);
-    window.open(url, '_self');
+    window.location.href =
+      'https://www.google.com/search?q=' + encodeURIComponent(value);
     searchInput.value = '';
   } else {
-    showRandomHadith(); /* empty input = new random hadith */
+    showRandomHadith();
   }
 }
 
@@ -150,11 +152,34 @@ searchInput.addEventListener('keydown', (e) => {
     handleSubmit();
   }
 });
-
 searchSubmit.addEventListener('click', handleSubmit);
 
-/* ------------------------------------------------------------
-   4. Boot
-   ------------------------------------------------------------ */
+/* ---------- 4. Boot + idle warm-up ---------- */
 
 showRandomHadith();
+
+const idle = window.requestIdleCallback
+  ? window.requestIdleCallback.bind(window)
+  : (cb) => setTimeout(cb, 2000);
+
+const nav = navigator;
+const lowData = nav.connection?.saveData === true;
+const lowMem = typeof nav.deviceMemory === 'number' && nav.deviceMemory <= 2;
+
+if (!lowData && !lowMem) {
+  idle(
+    () => {
+      (async () => {
+        // Pre-load one chunk per book so first click on any imam is instant.
+        for (const imam of IMAMS) {
+          try {
+            await hadisLoader.warm(imam.key, 1);
+          } catch {
+            /* ignore */
+          }
+        }
+      })();
+    },
+    { timeout: 4000 },
+  );
+}

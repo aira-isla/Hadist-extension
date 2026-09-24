@@ -1,143 +1,202 @@
-/**
- * HadisLoader - Load chunked JSON data and verify integrity
- * 
- * Usage:
- *   const loader = new HadisLoader();
- *   loader.loadBook('bukhari').then(data => {
- *     console.log(data); // Full dataset
- *   });
- */
-
+/* ============================================================
+   HadisLoader — memory-bounded chunk loader.
+   - One chunk in memory is enough for a random hadith.
+   - LRU cache of `maxCachedChunks`.
+   - In-flight de-duplication for rapid clicks.
+   - Reads embedded `number` (your data has gaps: 97, 101, 105…).
+   ============================================================ */
 class HadisLoader {
-  constructor() {
-    this.cache = {};
+  constructor(options = {}) {
     this.index = null;
-    this.indexLoaded = false;
+    this.indexPromise = null;
+
+    // 4–8 works well for ~512-entry chunks (~1 MB parsed each).
+    this.maxCachedChunks = options.maxCachedChunks ?? 6;
+
+    // Your schema: number = hadith number, id = Indonesian, arab = Arabic.
+    this.numberFields = options.numberFields ?? [
+      'number',
+      'no',
+      'hadithnumber',
+    ];
+
+    /** @type {Map<string, any[]>} */
+    this.chunkCache = new Map();
+    /** @type {Map<string, Promise<any[]>>} */
+    this.chunkPending = new Map();
+    /** @type {Map<string, {totalLength:number, chunks:{file:string,length:number,start:number}[]}>} */
+    this.bookMeta = new Map();
   }
 
-  /**
-   * Load the chunk index
-   */
+  // ---------- index ----------
+
   async loadIndex() {
-    if (this.indexLoaded) {
+    if (this.index) return this.index;
+    if (this.indexPromise) return this.indexPromise;
+
+    this.indexPromise = (async () => {
+      const res = await fetch('file/chunks/index.json', {
+        cache: 'force-cache',
+      });
+      if (!res.ok) throw new Error(`Index load failed: ${res.status}`);
+      this.index = await res.json();
       return this.index;
+    })().finally(() => {
+      this.indexPromise = null;
+    });
+
+    return this.indexPromise;
+  }
+
+  async _ensureBookMeta(bookName) {
+    const cached = this.bookMeta.get(bookName);
+    if (cached) return cached;
+
+    const index = await this.loadIndex();
+    const book = index[bookName];
+    if (!book) throw new Error(`Book "${bookName}" not found in index`);
+
+    const rawChunks = Array.isArray(book.chunks) ? book.chunks : [];
+    const chunks = [];
+    let offset = 0;
+    let sum = 0;
+
+    for (const c of rawChunks) {
+      const file = typeof c === 'string' ? c : c.file;
+      const length = typeof c === 'string' ? 0 : c.length | 0;
+      chunks.push({ file, length, start: offset });
+      offset += length;
+      sum += length;
     }
 
-    try {
-      const response = await fetch('file/chunks/index.json');
-      this.index = await response.json();
-      this.indexLoaded = true;
-      return this.index;
-    } catch (error) {
-      console.error('Failed to load index:', error);
-      throw error;
+    const totalLength = book.totalLength || sum || 0;
+    const meta = { totalLength, chunks };
+    this.bookMeta.set(bookName, meta);
+    return meta;
+  }
+
+  // ---------- LRU chunk cache ----------
+
+  _touch(key) {
+    const v = this.chunkCache.get(key);
+    this.chunkCache.delete(key);
+    this.chunkCache.set(key, v);
+  }
+
+  _evict() {
+    while (this.chunkCache.size > this.maxCachedChunks) {
+      const oldest = this.chunkCache.keys().next().value;
+      this.chunkCache.delete(oldest);
     }
   }
 
-  /**
-   * Load all chunks for a specific book and reconstruct the full dataset
-   * @param {string} bookName - Name of the book (e.g., 'bukhari', 'muslim')
-   * @returns {Promise<Array>} Full reconstructed data array
-   */
-  async loadBook(bookName) {
-    // Check cache first
-    if (this.cache[bookName]) {
-      return this.cache[bookName];
+  async _fetchChunk(file) {
+    if (this.chunkCache.has(file)) {
+      this._touch(file);
+      return this.chunkCache.get(file);
     }
-
-    // Load index if not already loaded
-    const index = await this.loadIndex();
-
-    if (!index[bookName]) {
-      throw new Error(`Book "${bookName}" not found in index`);
+    if (this.chunkPending.has(file)) {
+      return this.chunkPending.get(file);
     }
+    const p = (async () => {
+      const res = await fetch(`file/chunks/${file}`, { cache: 'force-cache' });
+      if (!res.ok)
+        throw new Error(`Chunk load failed: ${file} (${res.status})`);
+      const data = await res.json();
+      this.chunkCache.set(file, data);
+      this._evict();
+      return data;
+    })().finally(() => {
+      this.chunkPending.delete(file);
+    });
 
-    const bookMeta = index[bookName];
-    const fullData = [];
+    this.chunkPending.set(file, p);
+    return p;
+  }
 
-    console.log(`Loading ${bookName}...`);
-    console.log(`  Expected total entries: ${bookMeta.totalLength}`);
-    console.log(`  Loading ${bookMeta.chunks.length} chunk(s)...`);
+  // ---------- helpers ----------
 
-    // Load all chunks
-    for (let i = 0; i < bookMeta.chunks.length; i++) {
-      const chunkFile = bookMeta.chunks[i];
-      try {
-        const response = await fetch(`file/chunks/${chunkFile}`);
-        const chunkData = await response.json();
-        fullData.push(...chunkData);
-        console.log(`    ✓ Loaded chunk ${i + 1}/${bookMeta.chunks.length} (${chunkData.length} entries)`);
-      } catch (error) {
-        console.error(`Failed to load chunk ${i}:`, error);
-        throw error;
+  _resolveNumber(entry, globalIndex) {
+    for (const f of this.numberFields) {
+      const v = entry?.[f];
+      if (v !== undefined && v !== null && v !== '') return v;
+    }
+    // Only reached if the source JSON truly lacks a number field.
+    return globalIndex + 1;
+  }
+
+  // ---------- public ----------
+
+  async getRandomHadith(bookName) {
+    const meta = await this._ensureBookMeta(bookName);
+
+    // Fast path: known chunk lengths → uniform random across whole book.
+    if (meta.totalLength > 0 && meta.chunks.every((c) => c.length > 0)) {
+      let pos = Math.floor(Math.random() * meta.totalLength);
+      for (let i = 0; i < meta.chunks.length; i++) {
+        const ch = meta.chunks[i];
+        if (pos < ch.length) {
+          const data = await this._fetchChunk(ch.file);
+          const entry = data[pos];
+          const globalIndex = ch.start + pos;
+          const number = this._resolveNumber(entry, globalIndex);
+          return {
+            entry,
+            number,
+            globalIndex,
+            imam: bookName,
+            chunkFile: ch.file,
+          };
+        }
+        pos -= ch.length;
       }
     }
 
-    // Verify data integrity
-    console.log(`  Verifying data integrity...`);
-    if (fullData.length !== bookMeta.totalLength) {
-      throw new Error(
-        `Data mismatch for ${bookName}: ` +
-        `expected ${bookMeta.totalLength} entries, ` +
-        `got ${fullData.length} entries`
-      );
+    // Fallback: unknown chunk lengths → pick chunk, discover lengths, retry next time.
+    const ci = Math.floor(Math.random() * meta.chunks.length);
+    const ch = meta.chunks[ci];
+    const data = await this._fetchChunk(ch.file);
+
+    if (!ch.length) {
+      ch.length = data.length;
+      let off = 0;
+      for (const c of meta.chunks) {
+        c.start = off;
+        off += c.length || 0;
+      }
+      if (meta.chunks.every((c) => c.length > 0)) {
+        meta.totalLength = meta.chunks.reduce((s, c) => s + c.length, 0);
+      }
     }
 
-    console.log(`  ✓ ${bookName} loaded and verified (${fullData.length} entries)`);
-
-    // Cache the result
-    this.cache[bookName] = fullData;
-
-    return fullData;
+    const local = (Math.random() * data.length) | 0;
+    const entry = data[local];
+    const globalIndex = ch.start + local;
+    const number = this._resolveNumber(entry, globalIndex);
+    return { entry, number, globalIndex, imam: bookName, chunkFile: ch.file };
   }
 
-  /**
-   * Load multiple books at once
-   * @param {Array<string>} bookNames - Array of book names
-   * @returns {Promise<Object>} Object with book names as keys and data arrays as values
-   */
-  async loadBooks(bookNames) {
-    const results = {};
-    const promises = bookNames.map(name =>
-      this.loadBook(name).then(data => {
-        results[name] = data;
-      })
-    );
-
-    await Promise.all(promises);
-    return results;
+  async warm(bookName, chunkCount = 1) {
+    const meta = await this._ensureBookMeta(bookName);
+    const n = Math.min(chunkCount, meta.chunks.length);
+    for (let i = 0; i < n; i++) {
+      try {
+        await this._fetchChunk(meta.chunks[i].file);
+      } catch {
+        /* ignore */
+      }
+    }
   }
 
-  /**
-   * Load all available books
-   * @returns {Promise<Object>} Object with all books
-   */
-  async loadAllBooks() {
-    const index = await this.loadIndex();
-    const bookNames = Object.keys(index);
-    return this.loadBooks(bookNames);
-  }
-
-  /**
-   * Get a random hadith from a specific book
-   * @param {string} bookName - Name of the book
-   * @returns {Promise<Object>} Random hadith entry
-   */
-  async getRandomHadith(bookName) {
-    const data = await this.loadBook(bookName);
-    const randomIndex = Math.floor(Math.random() * data.length);
-    return data[randomIndex];
-  }
-
-  /**
-   * Clear cache
-   */
   clearCache() {
-    this.cache = {};
+    this.chunkCache.clear();
+    this.chunkPending.clear();
+    this.bookMeta.clear();
+    this.index = null;
+    this.indexPromise = null;
   }
 }
 
-// Export for Node.js environment
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = HadisLoader;
 }
